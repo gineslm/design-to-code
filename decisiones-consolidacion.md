@@ -1,6 +1,6 @@
 # Decisiones de consolidación — estado
 
-**Versión:** v0.4 · **Estado:** borrador (vivo) · **Fecha:** 2026-08-06
+**Versión:** v0.5 · **Estado:** borrador (vivo) · **Fecha:** 2026-08-06
 **Deriva de:** metodologia-sintesis.md v0.2+ (fuente más actualizada del modelo de cadena/gates), metodologia.md v0.1, entrada-consolidacion-ccode.md v0.1, investigacion/ (00-nucleo, pruebas A/B, recomendaciones), **Prueba C** (registro-implementacion.md + tabla de diagnóstico de desviaciones + triangulación B/C/prototipo)
 
 > Registro compacto de las decisiones cerradas en la conversación de consolidación de metodología. Agrupadas por dónde impactan en el corpus. Es la materia prima para verter contenido en los documentos y el puente si se retoma el trabajo en otra conversación. No sustituye a los documentos de metodología; los alimenta.
@@ -97,22 +97,19 @@
 
 ## G. Ejes documentales, nomenclatura y estructura
 
-- **No hay 4º eje de metodología transversal.** PERO Claude.ai **tiene funciones propias de capa** (research, análisis funcional, requisitos, perfil técnico) — no es solo orquestador → tiene su propia metodología de capa + instrucciones operativas, **simétrico a claude-design y claude-code**.
-- **Línea de corte confirmada — tres documentos por capa:**
-  - **Metodología** (transversal, cambia poco, se hereda).
-  - **Instrucciones + guía de acciones unificadas** (operativo, "empieza aquí").
-  - **Registro** (vivo).
-  - *No unificar* metodología con lo operativo (rompería el versionado §6 / recomendación 1). *Sí* unificar instrucciones + guía (misma naturaleza).
-- **Nomenclatura: nombres completos** (`metodologia-claude-design.md`, `metodologia-claude-code-im.md`…). Cero siglas ambiguas para agente ciego.
-- **Estructura en disco (hecha):**
-  - `metodologia/` — TRANSVERSAL, se hereda. Raíz + subcarpetas de capa (`claude-ai`, `claude-design`, `claude-code-im`, `claude-code-ex`).
-  - `proyecto/` — DE PROYECTO, nace vacío. Misma subdivisión por capa. Solo `claude-code` se parte en `im`/`ex`.
-  - `investigacion/` — externa, evidencia histórica.
-  - Primer corte = heredar vs generar (visible al instante); dentro, navegación por capa.
+> **Actualizado por el bloque L** (abajo): un documento de metodología por capa; nomenclatura agnóstica; estructura `core/`+`domain/`; `metodologia-aplicada` como visión general en `core/`.
+
+- **Simetría de capas.** La capa de **definición** tiene funciones propias (research, análisis funcional, requisitos, perfil técnico) — no es solo orquestador → tiene su propia metodología de capa, simétrica a diseño e implementación.
+- **Un documento de metodología por capa** (revisa el "tres documentos"): cada capa tiene **un** documento que reúne **metodología + procedimiento**. El **registro** es tier 3 (dato de instancia), no un documento de método. *(Al extraer el protocolo común, la frontera metodología/instrucciones se volvía artificial — L.4.)*
+- **Nomenclatura agnóstica de herramienta:** `metodologia-capa-diseno`, `metodologia-capa-conversion`… (sin nombres de herramienta). La tercera capa se llama **implementación**.
+- **Estructura en disco (real, repo `design-to-code`):**
+  - `core/` — universal + visión general: `metodologia-global`, `metodologia-aplicada` (visión general de las tres capas), `arquitectura-de-contextos`, `convenciones-repo`.
+  - `domain/` — operativo por capa: `capa-diseno/` (metodología + fases + `spec/`); `capa-definicion/` y `capa-conversion/` pendientes.
+  - Raíz: `metodologia-sintesis` (esquema), `decisiones-consolidacion`, `entrada-decisiones`, `CONTEXT_GIT`.
+  - *(Sustituye a la estructura anterior `metodologia/`+`proyecto/`. El tier 3 no se centraliza: vive por capa o en la herramienta.)*
 - **`im` = diseño→código (actual)** · **`ex` = código→diseño (pendiente)**.
-- **Raíz canónico = `metodologia.md`.** `00-nucleo.md` se **integra** en él y luego queda archivado en `investigacion/`. No coexisten dos raíces.
-- **`metodologia-sintesis.md` = andamio de borrador**; desaparece al congelar v1. No se perpetúa como norma.
-- **`guia-conversion` transversal** deriva de `investigacion/pruebas/guia-conversion.md`, **separando regla de instancia** (recomendación 1).
+- **`metodologia-sintesis` = esquema/mapa del sistema** (reconvertido; ya no es un andamio que desaparece).
+- **Raíz canónico = `metodologia-global` + `metodologia-aplicada`** (el antiguo `metodologia.md` detallado queda superado; `00-nucleo` archivado en investigación).
 
 ## H. Pendientes anotados (no cerrados)
 
@@ -223,3 +220,25 @@ Comparar los tres, no solo C vs prototipo, parte las desviaciones en tres clases
 - **K.1 — El eslabón "de dónde sale el handoff" no estaba documentado.** El agente ciego encontró el repo con solo el esqueleto de `ng new`, sin paquete de handoff, y **sin instrucción de cómo obtenerlo**. Paró correctamente (registró el hueco y consultó, según `instrucciones §1.3`) — el método funcionó en su parte de "no improvisar" — pero faltaba decir que el handoff vive en el proyecto de Claude Design y se obtiene por MCP. En C no se notó porque el handoff se generó en la misma sesión. **Corregido:** añadido §0 bis en instrucciones, §0 en el contrato, y nota en `CLAUDE.md` — vía MCP (por defecto) o paquete congelado; si no se puede obtener, hueco bloqueante.
 - **K.2 — Decisión de alcance: D no exige aislamiento estricto.** Se acepta que el agente lea documentos de metodología/proceso del proyecto de diseño por MCP. Razón: el trabajo es afinamiento incremental del método, no un experimento controlado; C↔D ya no es comparación exacta (entre ambas cambiaron spec saneado + fixes de código + DoD nuevo). Se mantiene solo la cláusula anti-arqueología de git (no copiar código de conversiones anteriores), por evitar atajos, no por pureza.
 - **K.3 — Dos desincronizaciones perfil-técnico↔repo detectadas por el agente** (a registrar/resolver, no bloqueantes): (a) `styles.scss` trae el theme Material por defecto (azure/blue) en vez de la semilla M3 `#6750A4` que fija el perfil técnico; (b) `angular.md` da por existente un `AppButtonComponent` que no está en `src/`. Mismo tipo de fallo que venimos viendo: documentación que asume un estado del repo que no coincide con el real.
+
+
+---
+
+## L. Estructuración del corpus (tiers), proceso de la capa de diseño y sistema de specs
+
+> Fusión condensada del bloque L. Detalle en `entrada-decisiones-2026-08-06.md` (L.1–L.13); L.14–L.16 son decisiones posteriores de la misma línea.
+
+- **L.1 · Tres tiers.** Tier 1 global (universal, agnóstico) · tier 2 aplicado (proceso de tres capas) · tier 3 datos de proyecto (no es metodología). Cadena: global → se instancia en aplicada → se alimenta con tier 3.
+- **L.2 · Nomenclatura agnóstica de capas** (`capa-definicion/diseno/conversion`). La tercera capa: **implementación**.
+- **L.3 · Partición global↔aplicado:** el núcleo abstracto va a global; el detalle atado al proceso, a aplicada.
+- **L.4 · Un documento por capa** (metodología + procedimiento); el registro es tier 3. Revisa el "tres documentos" de §G.
+- **L.5 · Protocolo común de agente/gate** — con el enfoque autosuficiente queda **embebido en cada documento de capa**; `metodologia-aplicada` (en `core/`) pasa a *describirlo*, no a definirlo.
+- **L.6 · Proceso de la capa de diseño = fases** (revisa "dos granos"): fase app · fase componentes (tareas iterativas) · fase vistas · cierre. Una **fase** = una o varias **tareas**, calculadas por proyecto; el **gate** cierra la fase.
+- **L.7 · Orden HF → spec** en la fase de componentes (supersede "especificaciones antes que alta fidelidad"): la spec recoge valores visuales ya asentados; elimina el "Spec visual: pendiente".
+- **L.8 · Reglas firmes de diseño:** DS-first + referencia; **ninguna vista incluye componentes sin ficha**.
+- **L.9 · Gobierno de divergencia del DS:** no divergencia silenciosa; aporte general → amplía DS, específico → local; siempre registrado.
+- **L.10–L.12 · Sistema de specs (`spec/`):** moldes (componente, vista, entidades) + hojas de requisitos (app, ds, navegación) + índice (`spec-vision-general`). Anidamiento app → vistas → componentes → DS; entidades transversal (nace en definición). Nomenclatura `spec-*`; separación requisitos (specs) ↔ proceso (método).
+- **L.13 · Tokens en dos capas** (primitivos + semánticos), consumo **solo semántico**, por defecto (reemplaza "solo si se anticipa rebrand").
+- **L.14 · Retroactividad** (cuatro reglas: normal · vuelve al dueño · deja rastro · evalúa impacto hacia delante y recoloca), en dos direcciones: **entre capas** y **entre fases**. Principio en global; mecanismo en aplicada; aplicación en la capa.
+- **L.15 · Versionado en dos ejes:** por **documento** (cabecera `v0.x`, mecánica en `convenciones-repo`) y por **Git** (decisión = commit, `R-00X`, en `CONTEXT_GIT`). *(Abierto: si ambos ejes conviven o si `R-00X` sustituye a las cabeceras por documento.)*
+- **L.16 · Repo:** el corpus vive en `design-to-code` (subido). *(Abierto: reconciliar con la idea previa de "MP4AI dentro del repo de código / repo por proyecto" — hoy es un repo de metodología independiente.)*
