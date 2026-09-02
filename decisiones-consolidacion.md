@@ -1,6 +1,6 @@
 # Decisiones de consolidación — estado
 
-**Versión:** v0.5 · **Estado:** borrador (vivo) · **Fecha:** 2026-08-06
+**Versión:** v0.6 · **Estado:** borrador (vivo) · **Fecha:** 2026-08-06
 **Deriva de:** metodologia-sintesis.md v0.2+ (fuente más actualizada del modelo de cadena/gates), metodologia.md v0.1, entrada-consolidacion-ccode.md v0.1, investigacion/ (00-nucleo, pruebas A/B, recomendaciones), **Prueba C** (registro-implementacion.md + tabla de diagnóstico de desviaciones + triangulación B/C/prototipo)
 
 > Registro compacto de las decisiones cerradas en la conversación de consolidación de metodología. Agrupadas por dónde impactan en el corpus. Es la materia prima para verter contenido en los documentos y el puente si se retoma el trabajo en otra conversación. No sustituye a los documentos de metodología; los alimenta.
@@ -241,4 +241,4 @@ Comparar los tres, no solo C vs prototipo, parte las desviaciones en tres clases
 - **L.13 · Tokens en dos capas** (primitivos + semánticos), consumo **solo semántico**, por defecto (reemplaza "solo si se anticipa rebrand").
 - **L.14 · Retroactividad** (cuatro reglas: normal · vuelve al dueño · deja rastro · evalúa impacto hacia delante y recoloca), en dos direcciones: **entre capas** y **entre fases**. Principio en global; mecanismo en aplicada; aplicación en la capa.
 - **L.15 · Versionado en dos ejes:** por **documento** (cabecera `v0.x`, mecánica en `convenciones-repo`) y por **Git** (decisión = commit, `R-00X`, en `CONTEXT_GIT`). *(Abierto: si ambos ejes conviven o si `R-00X` sustituye a las cabeceras por documento.)*
-- **L.16 · Repo:** el corpus vive en `design-to-code` (subido). *(Abierto: reconciliar con la idea previa de "MP4AI dentro del repo de código / repo por proyecto" — hoy es un repo de metodología independiente.)*
+- **L.16 · Repo del corpus (RESUELTO):** `design-to-code` es el **repo del corpus de metodología reutilizable** (tiers 1–2): aquí se revisa y ajusta el método para reutilizarlo en otros repos de desarrollo. **No aloja tier 3.** Al aplicar la metodología a un proyecto, el tier 3 vive en el **repo de desarrollo de ese proyecto** (o en las herramientas). Revisa la idea previa de "MP4AI dentro del repo de código / repo por proyecto".

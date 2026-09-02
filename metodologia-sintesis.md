@@ -1,6 +1,6 @@
 # Metodología — esquema del sistema
 
-**Versión:** v0.12 · **Estado:** borrador · **Fecha:** 2026-08-06
+**Versión:** v0.13 · **Estado:** borrador · **Fecha:** 2026-08-06
 **Deriva de:** metodologia-sintesis.md v0.2 (reencuadrado a mapa del sistema), decisiones-consolidacion.md v0.5 (bloque L), specs de la capa de diseño (`spec-*`).
 
 > **Qué es.** El **mapa de todo el sistema** en un solo documento: para verlo de un vistazo, **comparar** las fases de cada capa y **ubicar** cada documento. No es la norma detallada —esa vive en `metodologia-global`, `metodologia-aplicada` y las metodologías de capa—; este documento **orienta y organiza**.
@@ -47,17 +47,17 @@ design-to-code/                         # repo de metodología (corpus MP4AI)
 
 - **`core/`** universal + visión general · **`domain/`** operativo por capa.
 - **Pendiente de subir:** `capa-definicion/`, `capa-conversion/`, los `contratos/` (briefing · perfil técnico · handoff) y los `puentes/`.
-- **Abierto (L.16):** hoy es un **repo de metodología independiente**. La idea previa era *MP4AI dentro del repo de código, por proyecto*. Reconciliar: ¿`design-to-code` es el **corpus reutilizable** (tier 3 en repos de proyecto/herramientas) o el repo **de un proyecto** (tier 3 aquí, por capa)? De eso depende §2b.
+- **Naturaleza del repo (L.16, resuelto):** `design-to-code` es el **corpus de metodología reutilizable** (tiers 1–2): aquí se revisa y ajusta el método. **No aloja tier 3**; los proyectos que aplican el método lo hacen en sus propios repos de desarrollo.
 
 ## 2b · Dónde viven los datos de proyecto (tier 3)
 
-El tier 3 queda **local a cada capa**; **dónde** reside físicamente depende de la decisión abierta (L.16):
+Este repo es el **corpus reutilizable**: **no contiene tier 3**. El tier 3 es **por proyecto** y vive en el **repo de desarrollo** que aplica el método (o en las herramientas). Allí cada dato queda **local a su capa**:
 
 - **Definición:** documentos generados (alcance · entidades · historias · requisitos) + briefing + perfil técnico, con su registro.
-- **Diseño:** todo se genera **en la herramienta de diseño** y no se vuelca al repo (DS · specs rellenas · prototipo · handoff · registro). El repo solo guarda **metodología + specs (moldes)**.
+- **Diseño:** se genera **en la herramienta de diseño** (DS · specs rellenas · prototipo · handoff · registro); no se vuelca al repo.
 - **Implementación:** registro de actividad + informe final, junto al código.
 
-> Lo no volcable —el diseño— se queda en su herramienta; coordinar esa frontera es el cometido de `arquitectura-de-contextos`.
+> El método (este corpus) se **hereda/copia o se referencia** desde el repo de proyecto. Coordinar la frontera con la herramienta de diseño (tier 3 no volcable) es el cometido de `arquitectura-de-contextos`.
 
 ---
 
