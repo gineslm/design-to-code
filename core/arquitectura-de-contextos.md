@@ -23,7 +23,7 @@
 El problema aparece en dos planos, con el mismo fondo:
 
 - **(A) Coordinación entre hilos de trabajo** — la construcción de la metodología. Hilos con roles definidos (Corpus, Pruebas, Investigación); los hallazgos y las propuestas fluyen **hacia arriba por puentes, no lateralmente**. Es donde el mecanismo está más desarrollado.
-- **(B) Coordinación de datos entre herramientas** — la ejecución del proyecto. El tier 3 vive **distribuido** (definición y conversión en el repo, diseño en su herramienta). La frontera **no volcable** es la herramienta de diseño: su tier 3 se lee por conexión al proyecto de diseño (handoff), no está en el repo.
+- **(B) Coordinación de datos entre herramientas** — la ejecución del proyecto. El tier 3 vive **distribuido** (definición e implementación en el repo, diseño en su herramienta). La frontera **no volcable** es la herramienta de diseño: su tier 3 se lee por conexión al proyecto de diseño (handoff), no está en el repo.
 
 ## 3 · El mecanismo actual: puentes + sincronía humana
 
