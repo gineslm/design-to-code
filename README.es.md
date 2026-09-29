@@ -439,7 +439,9 @@ Las líneas pendientes principales son:
 
 **Ginés López Montalbán**
 
-Frontend / UX-UI · Design Systems · procesos asistidos por IA
+Design Engineer · Frontend / UX-UI · Design Systems · procesos asistidos por IA
+
+[Perfil online](https://www.dsigncloud.es/dosier/es/)
 
 ---
 

@@ -439,7 +439,9 @@ The main open lines of work are:
 
 **Ginés López Montalbán**
 
-Frontend / UX-UI · Design Systems · AI-assisted processes
+Design Engineer · Frontend / UX-UI · Design Systems · AI-assisted processes
+
+[Online profile](https://www.dsigncloud.es/dosier/en/)
 
 ---
 
