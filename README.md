@@ -1,246 +1,248 @@
 # Design to Code
 
-> Investigación aplicada sobre cómo estructurar procesos asistidos por agentes de IA para que sean trazables, reproducibles y suficientemente definidos antes de llegar a implementación.
+> **Note:** this repository's documentation and code are written in Spanish. This README is an English summary for readers who don't read Spanish. → [Leer en español](README.es.md)
 
-Este repositorio nació de una pregunta concreta:
+> Applied research on how to structure AI-agent-assisted processes so they are traceable, reproducible, and sufficiently well-defined before reaching implementation.
 
-> **¿Cuánto del trabajo de convertir diseño en código puede delegarse en agentes de IA, y con qué garantías?**
+This repository started from a concrete question:
 
-La investigación empezó en el flujo **documentación → diseño/prototipado → implementación frontend**, pero durante las pruebas aparecieron hallazgos más generales: el rendimiento del proceso dependía menos de «pedirle más» al agente y más de **cómo estaba definido, encadenado y validado el trabajo**.
+> **How much of the work of turning design into code can be delegated to AI agents, and with what guarantees?**
 
-De ahí surgieron dos resultados distintos:
+The research began within the flow **documentation → design/prototyping → frontend implementation**, but more general findings emerged during testing: the process's performance depended less on "asking the agent for more" and more on **how the work was defined, chained, and validated**.
 
-1. una **metodología de procesos por etapas**, formulada primero desde el caso design-to-code y abstraída después como núcleo reutilizable;
-2. un problema de segundo orden —la coordinación entre múltiples contextos que no comparten memoria— que abrió una línea arquitectónica propia y más tarde dio origen a **Warp**.
+That led to two distinct outcomes:
 
-Este repositorio conserva la investigación, la metodología derivada y su aplicación al proceso de diseño → código.
+1. a **staged-process methodology**, first formulated from the design-to-code case and later abstracted into a reusable core;
+2. a second-order problem — coordinating multiple contexts that don't share memory — which opened its own architectural line of work and later gave rise to **Warp**.
+
+This repository holds the research, the derived methodology, and its application to the design → code process.
 
 ---
 
-## 1. La pregunta de partida
+## 1. The starting question
 
-El objetivo inicial tenía dos frentes:
+The initial goal had two fronts:
 
-- evaluar cuánto podía automatizarse de la conversión de diseño a código;
-- estudiar un flujo de diseño y prototipado asistido por IA con suficiente control y fidelidad.
+- assess how much of the design-to-code conversion could be automated;
+- study an AI-assisted design and prototyping flow with enough control and fidelity.
 
-El proceso estudiado se organizó en tres capas:
+The process under study was organized into three layers:
 
 ```text
-definición
+definition
    ↓
-diseño
+design
    ↓
-implementación
+implementation
 ```
 
-La hipótesis operativa era que cada capa podía apoyarse en agentes distintos siempre que las transiciones entre ellas estuvieran suficientemente especificadas.
+The working hypothesis was that each layer could rely on a different agent, as long as the transitions between them were sufficiently specified.
 
-La investigación se realizó sobre un caso real de frontend en Angular, comparando distintos modos de transferencia desde herramientas de diseño y ejecutando varias conversiones del mismo proyecto.
+The research was carried out on a real Angular frontend case, comparing different transfer modes from design tools and running several conversions of the same project.
 
 ---
 
-## 2. Qué se probó
+## 2. What was tested
 
-Las pruebas no buscaban únicamente comprobar si un agente podía generar código. Buscaban aislar **qué condiciones hacían el proceso fiable y reproducible**.
+The tests weren't only about checking whether an agent could generate code. They aimed to isolate **which conditions made the process reliable and reproducible**.
 
-### Prueba A — conversión en bruto
+### Test A — raw conversion
 
-Importación directa de una vista para observar qué producía el sistema sin una metodología desarrollada alrededor.
+Direct import of a view to observe what the system produced without a developed methodology around it.
 
-Sirvió como diagnóstico inicial.
+It served as an initial diagnostic.
 
-### Prueba B — conversión completa con contexto acumulado
+### Test B — full conversion with accumulated context
 
-Se ejecutó el flujo completo:
+The full flow was executed:
 
 ```text
-estilos
-→ componentes compartidos
-→ esqueleto de aplicación
-→ páginas
-→ navegación
+styles
+→ shared components
+→ application shell
+→ pages
+→ navigation
 ```
 
-La ejecución alcanzó el objetivo funcional planteado y sirvió para consolidar el procedimiento.
+The run reached the intended functional goal and helped consolidate the procedure.
 
-### Prueba C — replicabilidad sin historial conversacional
+### Test C — replicability without conversation history
 
-La misma conversión se ejecutó mediante un agente que sólo disponía de:
+The same conversion was run through an agent that only had access to:
 
-- documentación;
-- repositorio;
-- artefactos del proceso.
+- documentation;
+- the repository;
+- process artifacts.
 
-No disponía del historial de conversación de las pruebas anteriores.
+It did not have access to the conversation history from the previous tests.
 
-Esta prueba permitió estudiar si el método podía sostenerse en **artefactos persistentes**, en lugar de depender de memoria conversacional.
+This test made it possible to study whether the method could hold up on **persistent artifacts**, rather than depending on conversational memory.
 
-### Prueba D — conversión ciega con el método corregido
+### Test D — blind conversion with the corrected method
 
-Tras detectar pérdidas de fidelidad visual en C se añadió un control visual al procedimiento y se repitió la ejecución.
+After detecting losses of visual fidelity in C, a visual check was added to the procedure and the run was repeated.
 
-El resultado fue especialmente útil porque **no mejoró de forma sustancial la fidelidad**.
+The result was especially useful because fidelity **did not improve substantially**.
 
-Eso permitió descartar que el problema estuviera únicamente en el tramo final de conversión y desplazar el análisis aguas arriba.
-
----
-
-## 3. Hallazgo principal: la definición condiciona el resultado
-
-Las pruebas apuntaron a una conclusión operativa:
-
-> **mejorar sólo la conversión no basta si las especificaciones que llegan a implementación siguen siendo incompletas.**
-
-La fidelidad del resultado dependía directamente de la calidad de los artefactos previos:
-
-- documentación;
-- definición funcional;
-- especificaciones de diseño;
-- contratos entre etapas;
-- fichas de componente.
-
-El cuello de botella identificado fue, por tanto, el **contrato de especificación entre diseño e implementación**.
-
-La consecuencia fue importante: el problema dejó de ser simplemente «cómo generar mejor código» y pasó a ser «cómo preparar un proceso para que un agente tenga que interpretar lo mínimo posible en cada transición».
+That ruled out the problem being solely in the final conversion step, and shifted the analysis upstream.
 
 ---
 
-## 4. De las pruebas a una metodología
+## 3. Main finding: definition determines the outcome
 
-De la investigación se extrajo un conjunto de principios que podían formularse con independencia del caso concreto.
+The tests pointed to an operational conclusion:
 
-El núcleo vive en:
+> **improving the conversion alone isn't enough if the specifications reaching implementation are still incomplete.**
+
+The fidelity of the result depended directly on the quality of the upstream artifacts:
+
+- documentation;
+- functional definition;
+- design specifications;
+- contracts between stages;
+- component specs.
+
+The bottleneck identified was, therefore, the **specification contract between design and implementation**.
+
+The consequence was significant: the problem stopped being simply "how to generate better code" and became "how to prepare a process so an agent has to interpret as little as possible at each transition."
+
+---
+
+## 4. From tests to a methodology
+
+A set of principles that could be formulated independently of the specific case was extracted from the research.
+
+The core lives in:
 
 [`core/metodologia-global.md`](core/metodologia-global.md)
 
-Ese documento se define como un **núcleo agnóstico para procesos de transformación por etapas**. Su grado de universalidad se mantiene explícitamente acotado: parte de un único proceso y distingue entre reglas confirmadas, respaldadas e hipótesis.
+That document is defined as an **agnostic core for staged transformation processes**. Its degree of universality is explicitly bounded: it stems from a single process and distinguishes between confirmed rules, supported rules, and hypotheses.
 
-Los principios principales son:
+The main principles are:
 
-### Trazabilidad
+### Traceability
 
-Todo resultado debe poder seguirse hacia atrás hasta la decisión o fuente que lo originó, y toda decisión debe poder seguirse hacia delante hasta donde aterriza.
+Every result must be traceable back to the decision or source that produced it, and every decision must be traceable forward to where it lands.
 
-### Versionado y linaje
+### Versioning and lineage
 
-Los artefactos derivados deben permitir detectar cuándo quedan desfasados respecto a sus fuentes.
+Derived artifacts must make it possible to detect when they've fallen out of sync with their sources.
 
-### Reducción de ambigüedad
+### Ambiguity reduction
 
-Cada fase debe hacer explícito lo que estaba implícito para que el actor aguas abajo **interprete menos y ejecute más**.
+Each phase must make explicit what was implicit, so the downstream actor **interprets less and executes more**.
 
-### Reutilización y consistencia
+### Reuse and consistency
 
-Los patrones repetidos deben definirse una vez y reutilizarse, en lugar de duplicarse y divergir.
+Repeated patterns must be defined once and reused, instead of being duplicated and diverging.
 
-### Cascada con iteración
+### Waterfall with iteration
 
-Una fase se valida antes de construir sobre ella, pero puede iterarse internamente y revisarse si aparece conocimiento nuevo.
+A phase is validated before building on it, but it can be iterated internally and revisited if new knowledge emerges.
 
-### Retroactividad
+### Retroactivity
 
-Volver a una fase cerrada no se considera un fallo. Si una fase posterior descubre un problema aguas arriba, se corrige en origen, se registra y se evalúa su impacto hacia delante.
+Returning to a closed phase is not considered a failure. If a later phase uncovers an upstream problem, it's fixed at the source, logged, and its forward impact is assessed.
 
-### Enriquecimiento acumulativo
+### Cumulative enrichment
 
-Cada fase añade información sin perder lo ya establecido.
+Each phase adds information without losing what was already established.
 
-### Método constante, fuente variable
+### Constant method, variable source
 
-El método debe poder mantenerse estable mientras cambia el proyecto al que se aplica.
+The method must be able to stay stable while the project it's applied to changes.
 
 ---
 
-## 5. Gates y validación humana
+## 5. Gates and human validation
 
-La metodología introduce puntos explícitos de parada.
+The methodology introduces explicit stopping points.
 
-No todos tienen el mismo alcance:
+They don't all have the same scope:
 
 ```text
-tarea
+task
   ↓
-parada de contenido
+content stop
 
-fase
+phase
   ↓
-gate de consolidación
+consolidation gate
 
-cambio de capa
+layer change
   ↓
-gate reforzado
+reinforced gate
 ```
 
-El propósito del gate no es añadir burocracia, sino impedir que un error o una contradicción siga propagándose silenciosamente.
+The purpose of the gate isn't to add bureaucracy, but to prevent an error or contradiction from silently propagating further.
 
-La validación humana forma parte del modelo: el cierre de una fase no se reduce a una comprobación mecánica porque el contenido necesita juicio.
+Human validation is part of the model: closing a phase isn't reduced to a mechanical check, because the content requires judgment.
 
 ---
 
-## 6. La metodología aplicada al flujo Design to Code
+## 6. The methodology applied to the Design to Code flow
 
-La aplicación concreta del núcleo vive en:
+The concrete application of the core lives in:
 
 [`core/metodologia-aplicada.md`](core/metodologia-aplicada.md)
 
-La metodología aplicada organiza el proceso en tres capas con responsabilidades distintas.
+The applied methodology organizes the process into three layers with distinct responsibilities.
 
-### Definición
+### Definition
 
-Razona, documenta y orquesta.
+Reasons, documents, and orchestrates.
 
-Es la fuente de las decisiones de requisito y alcance.
+It's the source of scope and requirement decisions.
 
-### Diseño
+### Design
 
-Transforma la definición en forma visual.
+Turns the definition into visual form.
 
-No debería introducir requisitos nuevos silenciosamente: los huecos deben devolverse hacia arriba o registrarse.
+It shouldn't silently introduce new requirements: gaps must be surfaced upward or logged.
 
-### Implementación
+### Implementation
 
-Transforma diseño y especificaciones en código.
+Turns design and specifications into code.
 
-Su responsabilidad es implementar con fidelidad, no redefinir requisitos o diseño por defecto.
+Its responsibility is to implement faithfully, not to redefine requirements or design by default.
 
-El principio de gobierno es:
+The governing principle is:
 
-> **las decisiones deben tomarse donde existe el contexto para tomarlas.**
+> **decisions must be made where the context to make them exists.**
 
-Una capa inferior puede descubrir algo que obligue a revisar una superior, pero ese cambio debe registrarse y propagarse.
+A lower layer may discover something that forces a higher one to be revisited, but that change must be logged and propagated.
 
 ---
 
-## 7. Contratos entre capas
+## 7. Contracts between layers
 
-Las transiciones no se tratan como simples entregas de archivos.
+Transitions aren't treated as simple file handoffs.
 
-Funcionan como **contratos** que deben permitir que el receptor opere sin necesitar el historial conversacional del emisor.
+They work as **contracts** that must let the receiver operate without needing the sender's conversation history.
 
-En el modelo actual:
+In the current model:
 
 ```text
-Definición ──briefing──→ Diseño
+Definition ──briefing──→ Design
 
-Definición ──perfil técnico──→ Implementación
+Definition ──technical profile──→ Implementation
 
-Diseño ──handoff──→ Implementación
+Design ──handoff──→ Implementation
 ```
 
-La prueba fuerte de suficiencia es:
+The strong test of sufficiency is:
 
-> **¿puede un receptor sin acceso al historial ejecutar correctamente usando sólo lo que cruza la frontera?**
+> **can a receiver with no access to the history execute correctly using only what crosses the boundary?**
 
-Ese criterio fue precisamente el que motivó las pruebas con agentes «ciegos».
+That criterion is precisely what motivated the tests with "blind" agents.
 
 ---
 
-## 8. Artefactos de diseño y especificación
+## 8. Design and specification artifacts
 
-El repositorio contiene además una capa específica de diseño y una familia de specs que materializan el contrato diseño → implementación.
+The repository also contains a specific design layer and a family of specs that materialize the design → implementation contract.
 
-Entre ellas:
+Among them:
 
 - `spec-app.md`
 - `spec-componente.md`
@@ -250,135 +252,135 @@ Entre ellas:
 - `spec-vision-general.md`
 - `spec-vista.md`
 
-Estas fichas no son un catálogo decorativo: intentan reducir la cantidad de decisiones implícitas que quedarían en manos de implementación.
+These specs aren't a decorative catalog: they try to reduce the number of implicit decisions that would otherwise be left to implementation.
 
-La investigación actual señala precisamente esta frontera como el principal ámbito que todavía necesita madurar.
-
----
-
-## 9. Registro, deriva y modos de fallo
-
-La metodología identifica tres modos de fallo relevantes:
-
-### Contrabando
-
-Aparece una decisión que ninguna etapa había autorizado.
-
-Puede ser un hallazgo legítimo, pero debe registrarse.
-
-### Deriva
-
-Se pierde o contradice algo ya validado aguas arriba.
-
-### Incoherencia
-
-Dos piezas producidas en paralelo dejan de encajar entre sí.
-
-En los tres casos, el registro es la diferencia entre un cambio auditable y una deuda invisible.
-
-Por eso las decisiones que aparecen durante el proceso no deberían quedar únicamente en una conversación.
+The current research points precisely to this boundary as the main area that still needs to mature.
 
 ---
 
-## 10. Madurez: qué sabemos y qué no
+## 9. Logging, drift, and failure modes
 
-Este repositorio distingue deliberadamente entre:
+The methodology identifies three relevant failure modes:
 
-- **confirmado** — demostrado por evidencia suficiente dentro de la investigación;
-- **respaldado** — apoyado por la evidencia disponible, pero todavía no cerrado;
-- **hipótesis** — plausible, pendiente de probar.
+### Smuggling
 
-Entre los resultados actuales:
+A decision appears that no stage had authorized.
 
-- el flujo asistido por agentes es viable de extremo a extremo;
-- las pruebas respaldan que la calidad de documentación y especificaciones condiciona directamente la fidelidad;
-- mejorar únicamente la conversión no resolvió las desviaciones;
-- el contrato diseño → código sigue siendo el principal ámbito pendiente;
-- la extrapolación del núcleo metodológico a otros procesos sigue siendo una hipótesis, porque todavía se ha probado sobre un único dominio.
+It may be a legitimate finding, but it must be logged.
 
-Este repositorio debe leerse como **investigación en evolución**, no como un estándar terminado.
+### Drift
+
+Something already validated upstream is lost or contradicted.
+
+### Incoherence
+
+Two pieces produced in parallel stop fitting together.
+
+In all three cases, logging is what separates an auditable change from invisible debt.
+
+That's why decisions that emerge during the process shouldn't remain only in a conversation.
 
 ---
 
-## 11. El problema que la metodología no resolvía
+## 10. Maturity: what we know and what we don't
 
-Mientras se desarrollaba la investigación apareció un problema diferente.
+This repository deliberately distinguishes between:
 
-El trabajo empezó a repartirse entre múltiples conversaciones y herramientas:
+- **confirmed** — demonstrated by sufficient evidence within the research;
+- **supported** — backed by available evidence, but not yet closed;
+- **hypothesis** — plausible, pending testing.
 
-- unas investigaban;
-- otras ejecutaban pruebas;
-- otras consolidaban metodología;
-- otras trabajaban diseño o implementación.
+Among the current results:
 
-Esos contextos no compartían memoria.
+- the agent-assisted flow is viable end to end;
+- the tests support that documentation and specification quality directly determines fidelity;
+- improving the conversion alone did not resolve the deviations;
+- the design → code contract remains the main pending area;
+- extrapolating the methodological core to other processes is still a hypothesis, because it has only been tested on a single domain so far.
 
-La consecuencia era que el conocimiento del proyecto quedaba repartido y podía desincronizarse.
+This repository should be read as **evolving research**, not as a finished standard.
 
-El primer intento de modelar este problema vive en:
+---
+
+## 11. The problem the methodology didn't solve
+
+While the research was developing, a different problem appeared.
+
+The work started to be spread across multiple conversations and tools:
+
+- some researched;
+- some ran tests;
+- some consolidated methodology;
+- some worked on design or implementation.
+
+Those contexts didn't share memory.
+
+The consequence was that project knowledge became scattered and could fall out of sync.
+
+The first attempt to model this problem lives in:
 
 [`core/arquitectura-de-contextos.md`](core/arquitectura-de-contextos.md)
 
-Ese documento está marcado explícitamente como **exploratorio**. Describe un mecanismo inicial basado en:
+That document is explicitly marked as **exploratory**. It describes an initial mechanism based on:
 
-- documentos-puente;
-- responsabilidades de edición;
-- estados;
-- retorno de información;
-- sincronización humana.
+- bridge documents;
+- editing responsibilities;
+- states;
+- information feedback;
+- human synchronization.
 
-No forma parte del núcleo metodológico maduro.
+It's not part of the mature methodological core.
 
-Fue la señal de que había aparecido un problema de otro nivel.
+It was the signal that a problem of a different order had appeared.
 
 ---
 
-## 12. De aquí nace Warp
+## 12. This is where Warp was born
 
-La metodología responde principalmente a:
+The methodology mainly answers:
 
-> **¿cómo debe avanzar y validarse un proceso asistido por agentes?**
+> **how should an agent-assisted process move forward and be validated?**
 
-La nueva pregunta era:
+The new question was:
 
-> **¿cómo se mantiene conocimiento y responsabilidad coherentes cuando varias instancias trabajan sobre ese proceso sin compartir memoria?**
+> **how do you keep knowledge and responsibility coherent when several instances work on that process without sharing memory?**
 
-Esa segunda pregunta se separó posteriormente de este repositorio y evolucionó como una investigación arquitectónica propia:
+That second question was later split off from this repository and evolved into its own architectural research:
 
-**Warp — arquitectura de conocimiento para colaboración humano–IA**
+**Warp — a knowledge architecture for human–AI collaboration**
 
-Warp desarrolla ese problema alrededor de ideas como:
+Warp develops that problem around ideas such as:
 
-- responsabilidades persistentes;
+- persistent responsibilities;
 - THREADs;
 - MANIFESTs;
 - HANDOFFs;
-- autoridad documental;
-- corpus común;
-- agentes intercambiables;
-- Git como historia del conocimiento;
-- carga progresiva de contexto;
-- validación estructural.
+- document authority;
+- shared corpus;
+- interchangeable agents;
+- Git as the history of knowledge;
+- progressive context loading;
+- structural validation.
 
-Design to Code y Warp son por tanto proyectos relacionados, pero no equivalentes:
+Design to Code and Warp are therefore related projects, but not equivalent:
 
 ```text
 Design to Code
-→ investiga un proceso
-→ extrae una metodología
-→ descubre un problema de coordinación
+→ investigates a process
+→ extracts a methodology
+→ discovers a coordination problem
 
 Warp
-→ toma ese problema
-→ lo abstrae
-→ desarrolla una arquitectura de conocimiento
+→ takes that problem
+→ abstracts it
+→ develops a knowledge architecture
 ```
 
-**Repositorio de Warp:** añadir enlace cuando esté publicado.
+**Warp repository:** [github.com/gineslm/warp](https://github.com/gineslm/warp)
 
 ---
 
-## 13. Estructura del repositorio
+## 13. Repository structure
 
 ```text
 .
@@ -407,44 +409,44 @@ Warp
 └── CONTEXT_GIT.md
 ```
 
-La estructura refleja tres niveles distintos:
+The structure reflects three distinct levels:
 
 ```text
-núcleo metodológico
+methodological core
         ↓
-aplicación al proceso
+process application
         ↓
-artefactos específicos de cada capa
+layer-specific artifacts
 ```
 
 ---
 
-## 14. Estado
+## 14. Status
 
-La investigación sigue abierta.
+The research is still ongoing.
 
-Las líneas pendientes principales son:
+The main open lines of work are:
 
-1. mejorar el contrato de especificación entre diseño e implementación;
-2. completar al mismo nivel las capas de definición y diseño/prototipado;
-3. seguir validando qué principios del núcleo son realmente transferibles a otros procesos;
-4. separar progresivamente del repositorio los problemas arquitectónicos de contexto que ya pertenecen a Warp;
-5. medir en un piloto real impacto en tiempo, coste, consistencia y retrabajo.
+1. improving the specification contract between design and implementation;
+2. bringing the definition and design/prototyping layers up to the same level of completeness;
+3. continuing to validate which core principles are actually transferable to other processes;
+4. progressively separating the context-related architectural problems that already belong to Warp out of this repository;
+5. measuring impact on time, cost, consistency, and rework in a real pilot.
 
 ---
 
-## Autor
+## Author
 
 **Ginés López Montalbán**
 
-Frontend / UX-UI · Design Systems · procesos asistidos por IA
+Frontend / UX-UI · Design Systems · AI-assisted processes
 
 ---
 
-## Nota sobre el alcance
+## Note on scope
 
-Este repositorio documenta una investigación y una metodología en evolución.
+This repository documents a research effort and an evolving methodology.
 
-No pretende presentar como universales conclusiones obtenidas todavía de un único proceso, ni afirmar que el flujo actual elimine la necesidad de criterio humano.
+It does not claim to present as universal conclusions that, so far, have only been obtained from a single process, nor does it claim that the current flow removes the need for human judgment.
 
-El objetivo es hacer explícitas las decisiones, las pruebas, los límites y el grado de madurez de cada hallazgo.
+The goal is to make explicit the decisions, the tests, the limits, and the maturity level of each finding.
