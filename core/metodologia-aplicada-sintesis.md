@@ -1,7 +1,9 @@
-# Metodología — esquema del sistema
+# Metodología aplicada — síntesis (esquema del sistema)
 
-**Versión:** v0.13 · **Estado:** borrador · **Fecha:** 2026-08-06
-**Deriva de:** metodologia-sintesis.md v0.2 (reencuadrado a mapa del sistema), decisiones-consolidacion.md v0.5 (bloque L), specs de la capa de diseño (`spec-*`).
+**Versión:** v0.14 · **Estado:** borrador · **Fecha:** 2026-11-09
+**Deriva de:** metodologia-sintesis.md v0.13 (renombrado a `metodologia-aplicada-sintesis` y movido de la raíz a `core/`; contenido sin cambios salvo el mapa de documentos de §2), decisiones-consolidacion.md v0.5 (bloque L), specs de la capa de diseño (`spec-*`).
+
+> **Pendiente de unificar con `metodologia-aplicada`** (ver `TAREAS.md`, T-01). Hasta entonces conviven: aplicada gobierna y esta síntesis hace de mapa. Hay partes desfasadas (fases de diseño previas a F1–F6, vocabulario de paradas, referencias a documentos que no existen) que se resolverán al unificar.
 
 > **Qué es.** El **mapa de todo el sistema** en un solo documento: para verlo de un vistazo, **comparar** las fases de cada capa y **ubicar** cada documento. No es la norma detallada —esa vive en `metodologia-global`, `metodologia-aplicada` y las metodologías de capa—; este documento **orienta y organiza**.
 > **Estado del modelo.** Refleja el orden vigente (fases en diseño, **HF → spec** dentro de la fase de componentes). Lo que sigue como **andamiaje** va marcado.
@@ -27,7 +29,7 @@ design-to-code/                         # repo de metodología (corpus MP4AI)
 ├── core/                               # universal + visión general
 │   ├── metodologia-global.md           # núcleo agnóstico
 │   ├── metodologia-aplicada.md         # visión general de las tres capas
-│   ├── arquitectura-de-contextos.md    # exploratorio, no maduro
+│   ├── metodologia-aplicada-sintesis.md ← este esquema (mapa de entrada)
 │   └── convenciones-repo.md            # versionado por documento
 ├── domain/                             # operativo por capa
 │   └── capa-diseno/
@@ -38,9 +40,10 @@ design-to-code/                         # repo de metodología (corpus MP4AI)
 │           ├── spec-app.md · spec-ds.md · spec-navegacion.md
 │           └── spec-entidades.md · spec-vista.md · spec-componente.md
 │   (capa-definicion/ y capa-conversion/ · pendientes)
-├── metodologia-sintesis.md             ← este esquema (mapa de entrada)
-├── decisiones-consolidacion.md         # estado maestro de decisiones
-├── entrada-decisiones-2026-08-06.md
+├── evolucion/                          # cómo ha llegado a ser el método (no es método)
+│   ├── TAREAS.md                       # pendientes abiertos
+│   ├── decisiones-consolidacion.md     # registro histórico de decisiones (congelado)
+│   └── entrada-decisiones-2026-08-06.md # detalle del bloque L (congelado)
 ├── CONTEXT_GIT.md                      # versionado por Git (R-00X)
 └── README.md
 ```

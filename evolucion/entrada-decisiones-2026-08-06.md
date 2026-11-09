@@ -1,8 +1,10 @@
 # Entrada de decisiones — estructuración del corpus (tiers) y proceso de la capa de diseño
 
-**Versión:** v0.2 · **Estado:** borrador (vivo) · **Fecha:** 2026-08-06
+**Versión:** v1.0 · **Estado:** congelado · **Fecha:** 2026-11-09 *(contenido de v0.2, 2026-08-06)*
 **Deriva de:** metodologia-sintesis.md v0.2, decisiones-consolidacion.md v0.3, metodologia-claude-design.md v0.1, sesión de estructuración (hilo Corpus).
 
+> **Congelado.** Ya está fundida en `decisiones-consolidacion.md` §L, que la resume; aquí se conserva el detalle de L.1–L.13. La tabla de «Propagación pendiente» refleja el estado de 2026-08-06 y no está al día.
+>
 > Entrada pensada para **fundirse como bloque nuevo en `decisiones-consolidacion.md`** (siguiente letra libre, aquí **L**). Registra las decisiones cerradas en esta sesión antes de verterlas a los documentos. No sustituye a los documentos; los alimenta. Cada punto marca a qué documento(s) impacta (§ Propagación pendiente).
 
 ---
