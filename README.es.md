@@ -1,454 +1,197 @@
 # Design to Code
 
-> **Nota:** este README está también disponible en inglés → [Read in English](README.md)
+Metodología para trabajar con agentes de IA en procesos por etapas, desarrollada a partir de una investigación práctica sobre cómo llevar un producto digital desde su definición hasta el código.
 
-> Investigación aplicada sobre cómo estructurar procesos asistidos por agentes de IA para que sean trazables, reproducibles y suficientemente definidos antes de llegar a implementación.
-
-Este repositorio nació de una pregunta concreta:
-
-> **¿Cuánto del trabajo de convertir diseño en código puede delegarse en agentes de IA, y con qué garantías?**
-
-La investigación empezó en el flujo **documentación → diseño/prototipado → implementación frontend**, pero durante las pruebas aparecieron hallazgos más generales: el rendimiento del proceso dependía menos de «pedirle más» al agente y más de **cómo estaba definido, encadenado y validado el trabajo**.
-
-De ahí surgieron dos resultados distintos:
-
-1. una **metodología de procesos por etapas**, formulada primero desde el caso design-to-code y abstraída después como núcleo reutilizable;
-2. un problema de segundo orden —la coordinación entre múltiples contextos que no comparten memoria— que abrió una línea arquitectónica propia y más tarde dio origen a **Warp**.
-
-Este repositorio conserva la investigación, la metodología derivada y su aplicación al proceso de diseño → código.
+> Este README está también disponible en inglés → [Read in English](README.md)
 
 ---
 
-## 1. La pregunta de partida
+## 1. Qué es este repositorio
 
-El objetivo inicial tenía dos frentes:
+Este repositorio contiene una **metodología**: un conjunto de principios, reglas y plantillas para organizar un proceso de trabajo en el que intervienen agentes de IA, de forma que el resultado sea fiel a lo que se pidió, reproducible y trazable.
 
-- evaluar cuánto podía automatizarse de la conversión de diseño a código;
-- estudiar un flujo de diseño y prototipado asistido por IA con suficiente control y fidelidad.
+La metodología nació de un caso concreto, el paso de **definición → diseño → implementación** de una aplicación web, y está escrita en dos niveles:
 
-El proceso estudiado se organizó en tres capas:
+- un **núcleo universal** (tier 1), válido para cualquier proceso asistido por IA, con independencia de la herramienta o del proyecto;
+- su **aplicación a este proceso** (tier 2): las tres capas, cómo se traspasa el trabajo entre ellas y, con más detalle, la capa de diseño y su sistema de especificaciones.
 
-```text
-definición
-   ↓
-diseño
-   ↓
-implementación
-```
+Lo que el repositorio **no** contiene son datos de un proyecto concreto (lo que en la metodología se llama tier 3), código de aplicación ni herramientas. Es el método que un proyecto adopta, no un proyecto.
 
-La hipótesis operativa era que cada capa podía apoyarse en agentes distintos siempre que las transiciones entre ellas estuvieran suficientemente especificadas.
-
-La investigación se realizó sobre un caso real de frontend en Angular, comparando distintos modos de transferencia desde herramientas de diseño y ejecutando varias conversiones del mismo proyecto.
+**Por dónde empezar.** Si buscas la idea general, este README basta. Si quieres el método, lee primero [`core/metodologia-global.md`](core/metodologia-global.md) y después [`core/metodologia-aplicada.md`](core/metodologia-aplicada.md). Si vas a aplicarlo a la capa de diseño, sigue con [`domain/capa-diseno/`](domain/capa-diseno/).
 
 ---
 
-## 2. Qué se probó
+## 2. Qué se quería averiguar
 
-Las pruebas no buscaban únicamente comprobar si un agente podía generar código. Buscaban aislar **qué condiciones hacían el proceso fiable y reproducible**.
+La investigación partió de una pregunta práctica: **¿cuánto del trabajo de convertir un diseño en código puede delegarse en agentes de IA, y con qué garantías?**
 
-### Prueba A — conversión en bruto
+Para responderla se estudió un proceso completo en tres capas:
 
-Importación directa de una vista para observar qué producía el sistema sin una metodología desarrollada alrededor.
+- **Definición**: qué se construye y con qué restricciones (requisitos, entidades, historias de usuario, perfil técnico).
+- **Diseño**: la forma visual (sistema de diseño, wireframes, componentes, vistas y prototipo navegable).
+- **Implementación**: el código.
 
-Sirvió como diagnóstico inicial.
-
-### Prueba B — conversión completa con contexto acumulado
-
-Se ejecutó el flujo completo:
-
-```text
-estilos
-→ componentes compartidos
-→ esqueleto de aplicación
-→ páginas
-→ navegación
-```
-
-La ejecución alcanzó el objetivo funcional planteado y sirvió para consolidar el procedimiento.
-
-### Prueba C — replicabilidad sin historial conversacional
-
-La misma conversión se ejecutó mediante un agente que sólo disponía de:
-
-- documentación;
-- repositorio;
-- artefactos del proceso.
-
-No disponía del historial de conversación de las pruebas anteriores.
-
-Esta prueba permitió estudiar si el método podía sostenerse en **artefactos persistentes**, en lugar de depender de memoria conversacional.
-
-### Prueba D — conversión ciega con el método corregido
-
-Tras detectar pérdidas de fidelidad visual en C se añadió un control visual al procedimiento y se repitió la ejecución.
-
-El resultado fue especialmente útil porque **no mejoró de forma sustancial la fidelidad**.
-
-Eso permitió descartar que el problema estuviera únicamente en el tramo final de conversión y desplazar el análisis aguas arriba.
+La hipótesis de trabajo era que cada capa podía apoyarse en un agente distinto, siempre que el paso de una capa a la siguiente estuviera bien especificado. El caso de estudio fue una aplicación real de frontend en Angular, trabajada con herramientas de diseño y de código asistidas por IA.
 
 ---
 
-## 3. Hallazgo principal: la definición condiciona el resultado
+## 3. Cómo se evaluó
 
-Las pruebas apuntaron a una conclusión operativa:
+Las pruebas no buscaban comprobar si un agente es capaz de generar código, sino aislar **qué condiciones hacen que el proceso sea fiable**. Cada una cambiaba una variable respecto a la anterior.
 
-> **mejorar sólo la conversión no basta si las especificaciones que llegan a implementación siguen siendo incompletas.**
-
-La fidelidad del resultado dependía directamente de la calidad de los artefactos previos:
-
-- documentación;
-- definición funcional;
-- especificaciones de diseño;
-- contratos entre etapas;
-- fichas de componente.
-
-El cuello de botella identificado fue, por tanto, el **contrato de especificación entre diseño e implementación**.
-
-La consecuencia fue importante: el problema dejó de ser simplemente «cómo generar mejor código» y pasó a ser «cómo preparar un proceso para que un agente tenga que interpretar lo mínimo posible en cada transición».
+- **Prueba A: conversión en bruto.** Se importó una vista directamente desde la herramienta de diseño, sin método alrededor, para ver qué producía el sistema por sí solo. Sirvió de diagnóstico inicial.
+- **Prueba B: conversión completa con contexto acumulado.** Se recorrió el flujo entero (estilos, componentes compartidos, estructura de la aplicación, páginas y navegación) con un agente que tenía delante todo el historial de trabajo previo. Alcanzó el objetivo funcional y sirvió para consolidar el procedimiento.
+- **Prueba C: conversión ciega.** La misma conversión, pero con un agente **sin acceso al historial**: solo disponía de la documentación del método, el repositorio y el paquete entregado por la capa de diseño. Es lo que en la metodología se llama trabajar en **contexto limpio**, y es la prueba decisiva: si el método funciona, tiene que funcionar con lo que está escrito, no con lo que el agente recuerda de conversaciones anteriores.
+- **Prueba D: conversión ciega con el método corregido.** Tras los resultados de C se añadió un control visual al procedimiento de conversión y se repitió el ejercicio.
 
 ---
 
-## 4. De las pruebas a una metodología
+## 4. Qué se comprobó
 
-De la investigación se extrajo un conjunto de principios que podían formularse con independencia del caso concreto.
+**El método funciona cuando obliga a no improvisar.** En la conversión ciega, el agente no rellenó los huecos por su cuenta: los registró y consultó cada uno. Lo que estaba escrito de forma explícita en el diseño (textos, atributos de accesibilidad, formatos, comportamiento) llegó al código con alta fidelidad.
 
-El núcleo vive en:
+**Los tests en verde no garantizan fidelidad.** En C toda la verificación fue compilar y pasar tests; el agente nunca abrió un navegador. Los tests comprobaban texto y comportamiento, no apariencia, y dieron una falsa sensación de corrección. De doce desviaciones visuales, diez correspondían a cosas que **estaban en el diseño y no se trasladaron**. La metodología recoge esta lección como la diferencia entre **verificar** (comprobar mecánicamente) y **validar** (juzgar si el resultado es el correcto).
 
-[`core/metodologia-global.md`](core/metodologia-global.md)
+**Lo que no viaja en el paquete no existe para el agente.** Existía una regla para verificar los cambios de interfaz en el navegador, pero vivía en la configuración general del usuario y no en los documentos que recibió el agente. Un agente en contexto limpio solo aplica lo que está escrito en lo que se le entrega.
 
-Ese documento se define como un **núcleo agnóstico para procesos de transformación por etapas**. Su grado de universalidad se mantiene explícitamente acotado: parte de un único proceso y distingue entre reglas confirmadas, respaldadas e hipótesis.
+**Los fallos nacen aguas arriba y aparecen aguas abajo.** El fondo blanco que mostró la conversión no era un error de implementación: la especificación declaraba un color de superficie distinto del que usaba el prototipo. Del mismo modo, el selector que el agente resolvió con un componente equivocado no estaba tipificado en la especificación, que lo dejaba como «pendiente». La comparación entre B, C y el prototipo lo confirmó: **ninguna de las dos conversiones reprodujo el prototipo**, y cada una ganó y perdió fidelidad en sitios distintos. El problema era del proceso, no del modo ciego.
 
-Los principios principales son:
+**El diseño generado con IA cubre bien el camino feliz y deja incompletos los estados de borde**: carga, vacío, error y validación quedaban a medio definir aunque el briefing los exigiera.
 
-### Trazabilidad
+**Mejorar la conversión no basta.** La Prueba D añadió control visual a la implementación y la fidelidad no mejoró de forma sustancial. Eso descartó que el problema estuviera en el último tramo y llevó el análisis a lo que llega a ese tramo.
 
-Todo resultado debe poder seguirse hacia atrás hasta la decisión o fuente que lo originó, y toda decisión debe poder seguirse hacia delante hasta donde aterriza.
-
-### Versionado y linaje
-
-Los artefactos derivados deben permitir detectar cuándo quedan desfasados respecto a sus fuentes.
-
-### Reducción de ambigüedad
-
-Cada fase debe hacer explícito lo que estaba implícito para que el actor aguas abajo **interprete menos y ejecute más**.
-
-### Reutilización y consistencia
-
-Los patrones repetidos deben definirse una vez y reutilizarse, en lugar de duplicarse y divergir.
-
-### Cascada con iteración
-
-Una fase se valida antes de construir sobre ella, pero puede iterarse internamente y revisarse si aparece conocimiento nuevo.
-
-### Retroactividad
-
-Volver a una fase cerrada no se considera un fallo. Si una fase posterior descubre un problema aguas arriba, se corrige en origen, se registra y se evalúa su impacto hacia delante.
-
-### Enriquecimiento acumulativo
-
-Cada fase añade información sin perder lo ya establecido.
-
-### Método constante, fuente variable
-
-El método debe poder mantenerse estable mientras cambia el proyecto al que se aplica.
+La conclusión de todas las pruebas es la misma: **el agente que implementa solo puede ser fiel a lo que recibe escrito**. Todo lo que el traspaso deja abierto lo resuelve él, en silencio y a su manera. El punto débil del proceso era el **contrato de especificación entre diseño e implementación**.
 
 ---
 
-## 5. Gates y validación humana
+## 5. La solución: las specs como contrato entre diseño e implementación
 
-La metodología introduce puntos explícitos de parada.
+La respuesta que encontró la investigación es **trasladar a plantillas de especificación (specs) todo el conocimiento que la implementación necesita**, en lugar de dejarlo repartido entre la definición, la investigación, el prototipo y las conversaciones de diseño.
 
-No todos tienen el mismo alcance:
+Las specs se rellenan durante la capa de diseño. Recogen lo que viene de la definición (el modelo de datos, los requisitos, las restricciones técnicas) y lo que se decide al diseñar (componentes, estados, tokens, navegación), y lo dejan **determinado y escrito**. El paquete de entrega a implementación (el *handoff*) las transporta completas. Así, el agente que implementa recibe todo lo necesario para **implementar sin interpretar**: las decisiones se toman arriba, donde hay contexto para tomarlas bien, y no por descarte en la conversión.
 
-```text
-tarea
-  ↓
-parada de contenido
+El sistema tiene siete documentos, en [`domain/capa-diseno/spec/`](domain/capa-diseno/spec/):
 
-fase
-  ↓
-gate de consolidación
+| Spec | Qué recoge |
+|---|---|
+| [`spec-app`](domain/capa-diseno/spec/spec-app.md) | Requisitos globales de la aplicación: listado de componentes, estructura de archivos, decisiones compartidas entre diseño y técnica (p. ej. puntos de ruptura), reglas globales. |
+| [`spec-ds`](domain/capa-diseno/spec/spec-ds.md) | Qué debe exponer el sistema de diseño: tokens en dos capas (valores primitivos y nombres semánticos de uso) y su alcance mínimo. |
+| [`spec-navegacion`](domain/capa-diseno/spec/spec-navegacion.md) | Pantallas y transiciones (origen → acción → destino). Es la base del enrutado. |
+| [`spec-entidades`](domain/capa-diseno/spec/spec-entidades.md) | El modelo de datos. Nace en la capa de definición y se registra aquí para que vistas y componentes lo referencien. |
+| [`spec-vista`](domain/capa-diseno/spec/spec-vista.md) | Cada pantalla: qué componentes la forman, layout y responsive, estados, navegación, comportamiento y datos. |
+| [`spec-componente`](domain/capa-diseno/spec/spec-componente.md) | Cada pieza reutilizable: componente nativo al que corresponde, propiedades, estados dibujados, tokens, comportamiento y accesibilidad. |
+| [`spec-vision-general`](domain/capa-diseno/spec/spec-vision-general.md) | El índice que conecta las anteriores y fija el criterio de aceptación del conjunto. |
 
-cambio de capa
-  ↓
-gate reforzado
-```
+Las specs se **anidan** de lo global a lo atómico (aplicación → vistas → componentes → sistema de diseño) y cada nivel referencia al inferior sin repetirlo. Algunas son **moldes** que se rellenan una vez por elemento (cada componente, cada vista) y otras son **hojas de requisitos** que fijan una norma para toda la aplicación.
 
-El propósito del gate no es añadir burocracia, sino impedir que un error o una contradicción siga propagándose silenciosamente.
+Tres reglas las hacen eficaces:
 
-La validación humana forma parte del modelo: el cierre de una fase no se reduce a una comprobación mecánica porque el contenido necesita juicio.
+- **Se rellenan después del alta fidelidad.** La ficha de un componente se completa cuando sus estados ya están dibujados, de modo que recoge valores reales y no queda nada como «pendiente».
+- **Ninguna vista usa componentes sin ficha.** Así no llega a implementación ninguna pieza sin especificar.
+- **Los componentes consumen solo tokens semánticos.** Nunca valores crudos, lo que permite cambiar el tema o la marca sin tocar los componentes.
 
----
+El caso del selector muestra el efecto. Mientras la especificación lo dejaba abierto, la conversión tuvo que elegir un componente y eligió mal. En cuanto la ficha declaró el componente nativo leído del prototipo, la decisión desapareció de la implementación: ya no había nada que interpretar. Como la ficha describe cada componente por su función, sus estados y sus tokens, y declara a qué componente nativo corresponde, puede trasladarse a frameworks distintos sin que la implementación tenga que reinventarlo.
 
-## 6. La metodología aplicada al flujo Design to Code
-
-La aplicación concreta del núcleo vive en:
-
-[`core/metodologia-aplicada.md`](core/metodologia-aplicada.md)
-
-La metodología aplicada organiza el proceso en tres capas con responsabilidades distintas.
-
-### Definición
-
-Razona, documenta y orquesta.
-
-Es la fuente de las decisiones de requisito y alcance.
-
-### Diseño
-
-Transforma la definición en forma visual.
-
-No debería introducir requisitos nuevos silenciosamente: los huecos deben devolverse hacia arriba o registrarse.
-
-### Implementación
-
-Transforma diseño y especificaciones en código.
-
-Su responsabilidad es implementar con fidelidad, no redefinir requisitos o diseño por defecto.
-
-El principio de gobierno es:
-
-> **las decisiones deben tomarse donde existe el contexto para tomarlas.**
-
-Una capa inferior puede descubrir algo que obligue a revisar una superior, pero ese cambio debe registrarse y propagarse.
+**Criterio de aceptación:** con las siete specs completas, alguien que no ha visto nada del trabajo de diseño tiene todo lo necesario para traducirlo a código.
 
 ---
 
-## 7. Contratos entre capas
+## 6. La metodología que lo sostiene
 
-Las transiciones no se tratan como simples entregas de archivos.
+Las specs funcionan porque se inscriben en un método que decide cuándo se rellenan, quién valida y qué pasa cuando algo no encaja. Ese método está en [`core/`](core/).
 
-Funcionan como **contratos** que deben permitir que el receptor opere sin necesitar el historial conversacional del emisor.
+**El punto de partida.** Un agente trabaja solo con la información que recibe, y **toda ambigüedad que esa información deja abierta la resuelve él mismo**, sin avisar. Por eso la estrategia no es recortar etapas para ir más rápido, sino completarlas y validarlas una a una, de forma que la información necesaria quede capturada en el proceso antes de que un agente tenga que suplirla.
 
-En el modelo actual:
+**Cuatro principios** ([`metodologia-global`](core/metodologia-global.md) §1):
 
-```text
-Definición ──briefing──→ Diseño
+- **Reducción de ambigüedad**: en cada traspaso se hace explícito lo que estaba implícito, para que quien recibe interprete menos y ejecute más.
+- **Enriquecimiento acumulativo**: cada etapa añade detalle sin perder ni volver a decidir lo que ya estaba fijado.
+- **Validación**: un agente puede verificar, pero el cierre de cada etapa lo valida una persona.
+- **Trazabilidad**: todo resultado puede seguirse hasta la decisión que lo originó, y toda decisión hasta donde aterrizó.
 
-Definición ──perfil técnico──→ Implementación
+**Una estructura** que organiza el proceso en unidades anidadas: **proceso → capa → fase → tarea**. Cada **capa** trabaja con su propio contexto y no comparte memoria con las demás, así que el paso entre capas se gobierna con **contratos** que fijan qué debe cruzar. Dentro de cada fase, el agente analiza, propone un plan, ejecuta y verifica, y una persona valida. Los cierres se refuerzan a medida que se sube de nivel: una tarea se valida, una fase se cierra con un **gate** que registra lo decidido, y una capa se cierra con un gate reforzado que comprueba versiones y coherencia.
 
-Diseño ──handoff──→ Implementación
-```
+**Una dinámica** para cuando las cosas no salen en orden: volver a una fase ya cerrada es normal, siempre que se corrija en su origen, deje rastro y se evalúe a qué afecta hacia delante.
 
-La prueba fuerte de suficiencia es:
-
-> **¿puede un receptor sin acceso al historial ejecutar correctamente usando sólo lo que cruza la frontera?**
-
-Ese criterio fue precisamente el que motivó las pruebas con agentes «ciegos».
+**Su aplicación a este proceso** ([`metodologia-aplicada`](core/metodologia-aplicada.md)) define el papel de cada capa y sus tres contratos: el *briefing* (definición → diseño), el *perfil técnico* (definición → implementación) y el *handoff* (diseño → implementación), que es el que transporta las specs. La capa de diseño, la más desarrollada, tiene su método en [`metodologia-capa-diseno`](domain/capa-diseno/metodologia-capa-diseno.md) y sus seis fases en [`fases-proceso-diseno`](domain/capa-diseno/fases-proceso-diseno.md): sistema de diseño, navegación, wireframes, componentes, vistas y prototipo con handoff.
 
 ---
 
-## 8. Artefactos de diseño y especificación
+## 7. Alcance
 
-El repositorio contiene además una capa específica de diseño y una familia de specs que materializan el contrato diseño → implementación.
+**Desarrollado:**
 
-Entre ellas:
+- el núcleo universal de la metodología;
+- la visión general de las tres capas y sus contratos;
+- la capa de diseño completa: método, fases y sistema de specs.
 
-- `spec-app.md`
-- `spec-componente.md`
-- `spec-ds.md`
-- `spec-entidades.md`
-- `spec-navegacion.md`
-- `spec-vision-general.md`
-- `spec-vista.md`
+**No desarrollado todavía:**
 
-Estas fichas no son un catálogo decorativo: intentan reducir la cantidad de decisiones implícitas que quedarían en manos de implementación.
+- las capas de definición e implementación no tienen documento propio; su descripción está en la visión general;
+- la dirección inversa, de código a diseño, está identificada pero no desarrollada;
+- la edición manual en las herramientas sigue siendo un punto ciego para el registro: lo que se cambia a mano sin pasar por el agente no queda anotado.
 
-La investigación actual señala precisamente esta frontera como el principal ámbito que todavía necesita madurar.
+**Separado en otro proyecto:** la coordinación entre conversaciones y agentes que no comparten memoria. Ver el apartado 10.
 
----
-
-## 9. Registro, deriva y modos de fallo
-
-La metodología identifica tres modos de fallo relevantes:
-
-### Contrabando
-
-Aparece una decisión que ninguna etapa había autorizado.
-
-Puede ser un hallazgo legítimo, pero debe registrarse.
-
-### Deriva
-
-Se pierde o contradice algo ya validado aguas arriba.
-
-### Incoherencia
-
-Dos piezas producidas en paralelo dejan de encajar entre sí.
-
-En los tres casos, el registro es la diferencia entre un cambio auditable y una deuda invisible.
-
-Por eso las decisiones que aparecen durante el proceso no deberían quedar únicamente en una conversación.
+**Un límite general:** el núcleo se ha extraído de un solo proceso. La metodología distingue lo que tiene respaldo externo de lo que se ha observado aquí, y no presenta como universal lo que aún no lo es.
 
 ---
 
-## 10. Madurez: qué sabemos y qué no
+## 8. Estado actual
 
-Este repositorio distingue deliberadamente entre:
+La metodología está en **borrador** y sigue evolucionando:
 
-- **confirmado** — demostrado por evidencia suficiente dentro de la investigación;
-- **respaldado** — apoyado por la evidencia disponible, pero todavía no cerrado;
-- **hipótesis** — plausible, pendiente de probar.
+- el núcleo universal está en una versión nueva (v0.5) que reestructura los principios y todavía tiene apartados en redacción;
+- la visión general de las capas convive con un documento de síntesis anterior que hay que unificar con ella;
+- los trabajos pendientes están en [`evolucion/TAREAS.md`](evolucion/TAREAS.md).
 
-Entre los resultados actuales:
-
-- el flujo asistido por agentes es viable de extremo a extremo;
-- las pruebas respaldan que la calidad de documentación y especificaciones condiciona directamente la fidelidad;
-- mejorar únicamente la conversión no resolvió las desviaciones;
-- el contrato diseño → código sigue siendo el principal ámbito pendiente;
-- la extrapolación del núcleo metodológico a otros procesos sigue siendo una hipótesis, porque todavía se ha probado sobre un único dominio.
-
-Este repositorio debe leerse como **investigación en evolución**, no como un estándar terminado.
+Las líneas abiertas son completar las capas de definición e implementación al nivel de la de diseño, seguir comprobando qué principios del núcleo se sostienen en otros procesos, y desarrollar la dirección de código a diseño.
 
 ---
 
-## 11. El problema que la metodología no resolvía
-
-Mientras se desarrollaba la investigación apareció un problema diferente.
-
-El trabajo empezó a repartirse entre múltiples conversaciones y herramientas:
-
-- unas investigaban;
-- otras ejecutaban pruebas;
-- otras consolidaban metodología;
-- otras trabajaban diseño o implementación.
-
-Esos contextos no compartían memoria.
-
-La consecuencia era que el conocimiento del proyecto quedaba repartido y podía desincronizarse.
-
-El primer intento de modelar este problema vive en:
-
-[`core/arquitectura-de-contextos.md`](core/arquitectura-de-contextos.md)
-
-Ese documento está marcado explícitamente como **exploratorio**. Describe un mecanismo inicial basado en:
-
-- documentos-puente;
-- responsabilidades de edición;
-- estados;
-- retorno de información;
-- sincronización humana.
-
-No forma parte del núcleo metodológico maduro.
-
-Fue la señal de que había aparecido un problema de otro nivel.
-
----
-
-## 12. De aquí nace Warp
-
-La metodología responde principalmente a:
-
-> **¿cómo debe avanzar y validarse un proceso asistido por agentes?**
-
-La nueva pregunta era:
-
-> **¿cómo se mantiene conocimiento y responsabilidad coherentes cuando varias instancias trabajan sobre ese proceso sin compartir memoria?**
-
-Esa segunda pregunta se separó posteriormente de este repositorio y evolucionó como una investigación arquitectónica propia:
-
-**Warp — arquitectura de conocimiento para colaboración humano–IA**
-
-Warp desarrolla ese problema alrededor de ideas como:
-
-- responsabilidades persistentes;
-- THREADs;
-- MANIFESTs;
-- HANDOFFs;
-- autoridad documental;
-- corpus común;
-- agentes intercambiables;
-- Git como historia del conocimiento;
-- carga progresiva de contexto;
-- validación estructural.
-
-Design to Code y Warp son por tanto proyectos relacionados, pero no equivalentes:
-
-```text
-Design to Code
-→ investiga un proceso
-→ extrae una metodología
-→ descubre un problema de coordinación
-
-Warp
-→ toma ese problema
-→ lo abstrae
-→ desarrolla una arquitectura de conocimiento
-```
-
-**Repositorio de Warp:** añadir enlace cuando esté publicado.
-
----
-
-## 13. Estructura del repositorio
+## 9. Cómo está organizado el repositorio
 
 ```text
 .
-├── core/
+├── core/                        método vigente: núcleo y visión general
 │   ├── metodologia-global.md
 │   ├── metodologia-aplicada.md
-│   ├── arquitectura-de-contextos.md
+│   ├── metodologia-aplicada-sintesis.md
 │   └── convenciones-repo.md
-│
-├── domain/
+├── domain/                      método por capa
 │   └── capa-diseno/
 │       ├── metodologia-capa-diseno.md
 │       ├── fases-proceso-diseno.md
-│       └── spec/
-│           ├── spec-app.md
-│           ├── spec-componente.md
-│           ├── spec-ds.md
-│           ├── spec-entidades.md
-│           ├── spec-navegacion.md
-│           ├── spec-vision-general.md
-│           └── spec-vista.md
-│
-├── metodologia-sintesis.md
-├── decisiones-consolidacion.md
-├── entrada-decisiones-2026-08-06.md
-└── CONTEXT_GIT.md
+│       └── spec/                sistema de especificaciones
+├── evolucion/                   cómo ha llegado a ser el método
+│   ├── TAREAS.md
+│   ├── decisiones-consolidacion.md
+│   └── entrada-decisiones-2026-08-06.md
+└── CONTEXT_GIT.md               reglas de versionado con Git
 ```
 
-La estructura refleja tres niveles distintos:
+- **`core/`** contiene el método vigente: el núcleo universal, la visión general del proceso y las convenciones con que se mantienen los documentos.
+- **`domain/`** contiene el método de cada capa. Hoy solo la de diseño.
+- **`evolucion/`** no es método: recoge los trabajos pendientes y el registro histórico de las decisiones y pruebas que dieron forma a la metodología. Es útil para entender por qué el método es como es. Ante cualquier discrepancia, manda lo que está en `core/` y `domain/`.
 
-```text
-núcleo metodológico
-        ↓
-aplicación al proceso
-        ↓
-artefactos específicos de cada capa
-```
+Cada documento lleva una cabecera con su versión, su estado y los documentos de los que deriva. El historial de cambios se guarda en Git, con un commit por decisión.
 
 ---
 
-## 14. Estado
+## 10. Relación con Warp
 
-La investigación sigue abierta.
+Durante la investigación, el trabajo se repartió entre muchas conversaciones y herramientas que no compartían memoria, y el estado del proyecto empezó a desincronizarse. Ese problema es distinto del que estudia esta metodología: no trata de cómo avanzar y validar un proceso, sino de cómo mantener coherente el conocimiento cuando varios agentes trabajan sobre él a lo largo del tiempo.
 
-Las líneas pendientes principales son:
+Se exploró primero aquí y después se separó en un proyecto propio, **Warp**: una arquitectura de conocimiento basada en Git para coordinar personas y agentes, organizada en líneas de responsabilidad persistentes, con autoridad explícita sobre cada documento.
 
-1. mejorar el contrato de especificación entre diseño e implementación;
-2. completar al mismo nivel las capas de definición y diseño/prototipado;
-3. seguir validando qué principios del núcleo son realmente transferibles a otros procesos;
-4. separar progresivamente del repositorio los problemas arquitectónicos de contexto que ya pertenecen a Warp;
-5. medir en un piloto real impacto en tiempo, coste, consistencia y retrabajo.
+→ [github.com/gineslm/warp](https://github.com/gineslm/warp)
 
 ---
 
-## Autor
+## 11. Licencia y autor
+
+Licencia dual: el código, bajo **MIT**, y la documentación y la metodología, bajo **CC BY-SA 4.0**. Ver [`LICENSE`](LICENSE), [`LICENSE-CODE`](LICENSE-CODE) y [`LICENSE-DOCS`](LICENSE-DOCS).
 
 **Ginés López Montalbán**
-
 Design Engineer · Frontend / UX-UI · Design Systems · procesos asistidos por IA
-
 [Perfil online](https://www.dsigncloud.es/dosier/es/)
-
----
-
-## Nota sobre el alcance
-
-Este repositorio documenta una investigación y una metodología en evolución.
-
-No pretende presentar como universales conclusiones obtenidas todavía de un único proceso, ni afirmar que el flujo actual elimine la necesidad de criterio humano.
-
-El objetivo es hacer explícitas las decisiones, las pruebas, los límites y el grado de madurez de cada hallazgo.
