@@ -77,3 +77,53 @@
 **Por qué.** Afecta a `convenciones-repo`, a `CONTEXT_GIT` y al principio de trazabilidad de `metodologia-global`, que incluye «de qué deriva cada cosa y en qué versión». Warp evita mantener un segundo historial sobre Git y declara la procedencia solo cuando aporta significado.
 
 **Documentos afectados:** `core/convenciones-repo.md`, `CONTEXT_GIT.md`.
+
+---
+
+## T-05 · Corregir los fallos internos de `metodologia-global` v0.5
+
+**Qué.** Resolver las incoherencias internas de la nueva versión del núcleo:
+
+1. **Referencia a un principio inexistente.** §2, «Dirección y autoridad de las decisiones», termina en `[P6]`, pero §1 solo tiene cuatro principios. Decidir a cuál se ancla (probablemente P1, reducción de ambigüedad, o P4, trazabilidad).
+2. **La suficiencia del traspaso no está en §1.** La cabecera dice que «entra» como principio y §3 dice «§1 lo trata como propiedad; aquí es su instrumento», pero §1 no la recoge. Decidir si es un quinto principio, si se integra en uno de los cuatro (p. ej. en reducción de ambigüedad) o si se corrige la referencia de §3.
+3. **Alcance con dos versiones.** §0 reencuadra el núcleo a «cualquier proceso asistido por IA», pero el «Punto de partida» de §1 («válidas para cualquier proceso por etapas») y §4 («un proceso por etapas falla») siguen con el encuadre anterior.
+4. **Cuándo se registra.** §2 («Registro y versión») pide anotar «en el momento (no reconstruido al final)», y §3 («Niveles de cierre») dice que el registro ocurre al cerrar la fase y no en cada tarea. Aclarar la relación: por ejemplo, se anota en el momento y se consolida en el gate.
+5. **Cabecera:**
+   - el «Deriva de» cita `metodologia-capa-diseno` v0.22, pero la vigente es la v0.23;
+   - el estado «borrador (en redacción)» no es uno de los tres que admite `convenciones-repo` (`borrador` · `congelado` · `obsoleto`);
+   - se declara una reestructuración MAYOR y se numera v0.5. Dentro de borrador la convención lo permite, pero no deja claro si los documentos derivados (`metodologia-aplicada`, `convenciones-repo`, `metodologia-capa-diseno`) quedan desactualizados.
+
+**Además, contenido de la v0.4 que la v0.5 deja sin sitio:**
+- la **clasificación de decisiones** (diferido intencional · hueco accidental · conflicto) y la **escalada bifurcada** (instancia → documento del caso; método → metodología). La v0.5 dice que su mecánica es tier 2, pero ningún documento tier 2 la recoge todavía;
+- el principio de **reutilización y consistencia**, que sale del núcleo y solo pervive como «divergencia gobernada» del sistema de diseño en `metodologia-capa-diseno`.
+
+Decidir si van a `metodologia-aplicada` (ver T-01), a la capa, o se descartan.
+
+**Documentos afectados:** `core/metodologia-global.md` y, según lo que se decida, `core/metodologia-aplicada.md`.
+
+---
+
+## T-06 · Revisión de coherencia entre la global, la aplicada y la metodología de diseño
+
+**Qué.** Revisar de arriba abajo la cadena `metodologia-global` (tier 1) → `metodologia-aplicada` (tier 2, visión general) → `metodologia-capa-diseno` + `fases-proceso-diseno` (tier 2, capa), y alinearla con la global v0.5: que cada concepto viva en un solo nivel, que los niveles inferiores instancien y no redefinan lo de arriba, y que el vocabulario sea el mismo.
+
+**Por qué.** La global se reestructuró (v0.5) después de que se escribieran la aplicada (v0.5, deriva de global v0.4) y la metodología de diseño (v0.23, deriva de global v0.4). La global absorbe ahora conceptos que antes vivían en los niveles inferiores, y hay solapamientos y contradicciones.
+
+**Puntos ya detectados:**
+1. **Ciclo de fase duplicado y distinto.** La global §3 define el ciclo (analizar → planificar → ejecutar/verificar → validar/iterar → cerrar); la aplicada §4 mantiene la meta-plantilla (contexto → alcance → requerimiento → … → retorno), y `metodologia-capa-diseno` §4 tiene su propio ciclo de vida (apertura → ejecución → cierre). Decidir cuál es la norma y cómo la instancian los otros (relacionado con T-01, incoherencia 3).
+2. **Vocabulario redefinido.** `metodologia-capa-diseno` §4 define proceso · fase · tarea · gate, que ahora define la global §3 (proceso → capa → fase → tarea, niveles de cierre). La capa debería remitir a la global y añadir solo lo propio.
+3. **Niveles de cierre.** La global fija tres (tarea sin registro · fase con registro · capa reforzado); comprobar que la aplicada y la capa de diseño dicen lo mismo, incluida la comprobación de versiones solo en el cierre de capa.
+4. **Coherencia entre capas.** La global la exige en todo cierre de capa; la aplicada la limita al cierre de la capa de definición (relacionado con T-01, incoherencia 2).
+5. **Contratos y suficiencia del traspaso.** La global §3 define el contrato abstracto; la aplicada §3 y `metodologia-capa-diseno` §2 («Contratos») lo instancian. Comprobar que el criterio de suficiencia se formula igual en los tres niveles.
+6. **Validación frente a verificación.** Es un principio nuevo de la global (P3). Comprobar que el «gate visual continuo» de la capa de diseño y las verificaciones de `fases-proceso-diseno` («Verificación antes de validar») usan la distinción con el mismo sentido.
+7. **Retroactividad.** Está en la global §2, en la aplicada §5 y en `metodologia-capa-diseno` §4 (cuatro reglas). Que cada nivel diga solo lo suyo: el principio, las dos direcciones y la aplicación en la capa.
+8. **Edición manual.** `metodologia-capa-diseno` §2 dice que la edición manual se confina a la fase de alta fidelidad; `fases-proceso-diseno` F3 la prohíbe en wireframes, pero ni F4 ni F5 dicen si se permite.
+9. **La aplicada afirma una simetría que no existe.** Dice que «las tres capas tienen documento propio», pero en `domain/` solo está la de diseño.
+10. **Referencias y cabeceras desfasadas:**
+    - `metodologia-capa-diseno` §1 remite al «documento de metodología general» y al «esquema del sistema», que hoy son `metodologia-global` y `metodologia-aplicada`;
+    - su «Deriva de» y el de la aplicada citan global v0.4;
+    - `fases-proceso-diseno` cita `metodologia-capa-diseno` v0.22, y la vigente es la v0.23.
+
+**Orden recomendado:** después de T-05 (la global tiene que estar estable) y junto con T-01 o justo después (la aplicada se reescribe al unificar).
+
+**Documentos afectados:** `core/metodologia-global.md`, `core/metodologia-aplicada.md`, `domain/capa-diseno/metodologia-capa-diseno.md`, `domain/capa-diseno/fases-proceso-diseno.md`.
