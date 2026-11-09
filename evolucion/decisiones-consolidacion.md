@@ -1,8 +1,10 @@
 # Decisiones de consolidación — estado
 
-**Versión:** v0.6 · **Estado:** borrador (vivo) · **Fecha:** 2026-08-06
+**Versión:** v1.0 · **Estado:** congelado · **Fecha:** 2026-11-09 *(contenido de v0.6, 2026-08-06)*
 **Deriva de:** metodologia-sintesis.md v0.2+ (fuente más actualizada del modelo de cadena/gates), metodologia.md v0.1, entrada-consolidacion-ccode.md v0.1, investigacion/ (00-nucleo, pruebas A/B, recomendaciones), **Prueba C** (registro-implementacion.md + tabla de diagnóstico de desviaciones + triangulación B/C/prototipo)
 
+> **Congelado.** Registro histórico de la etapa de consolidación, anterior al versionado por Git. No se amplía: las decisiones nuevas se registran como commits (`R-00X`, ver `CONTEXT_GIT.md`) y los pendientes en `evolucion/TAREAS.md`. Partes de este registro están superadas por el método vigente en `core/` y `domain/`; ante discrepancia, mandan ellos.
+>
 > Registro compacto de las decisiones cerradas en la conversación de consolidación de metodología. Agrupadas por dónde impactan en el corpus. Es la materia prima para verter contenido en los documentos y el puente si se retoma el trabajo en otra conversación. No sustituye a los documentos de metodología; los alimenta.
 >
 > **Nota de vigencia:** el modelo de proceso (cadena de transiciones, tres niveles de parada, protocolo de gate) se rediseñó a fondo durante la revisión del sintético; `metodologia-sintesis.md` es hoy la versión más fiel de ese modelo. Los números de sección tipo §3.3.4 / §5.1 / §6.4 que aparezcan más abajo se refieren a la estructura de `metodologia.md` *previa* a la consolidación, no al sintético actual.
